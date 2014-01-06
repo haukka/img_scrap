@@ -9,7 +9,8 @@ var express = require('express')
   , path = require('path')
   , request = require('request')
   , cheerio = require('cheerio')
-  , fs = require('fs');
+  , fs = require('fs')
+  , sizeof = require('image-size');
 
 var app = express();
 
@@ -30,6 +31,14 @@ if ('development' == app.get('env')) {
 }
 
 var link = process.argv[2];
+var size = new String(process.argv[3]);
+
+var opewidth = size.substring(0, 3);
+var posx = size.search('x');
+var width = size.substring(3, posx);
+var opeheight = size.substring(posx+1, posx+4);
+var height = size.substring(posx+4, size.length);
+
 var url = [];
 
 if (link)
@@ -39,18 +48,25 @@ if (link)
 	    var $ = cheerio.load(body);
 	    $('img').each(function(){
 		var img = this.attr('src');
-		if (img.match('data:')){
+		if (img.match('data:')) {
 		    return;
 		}
-		else if ((!img.match('.png')) || (!img.match('.jpg')) )
+		else if ((!img.match('.png')) || (!img.match('.jpg')) || (!img.match('.jpeg')))
 		    url.push(img); 
-	    });	
-	    console.log(url);
-	    for (var i = 0; i < url.length; i++) {
-		request(url[i]).pipe(fs.createWriteStream('myimg/' + i));
-	    }
+	    });
+	    /*	    console.log(url);
+		    for (var i = 0; i < url.length; i++) {
+		    request(url[i]).pipe(fs.createWriteStream('myimg/' + i));
+		    }*/
 	}
     });
+    var file = fs.readdirSync('myimg');
+    for(var i = 0; file[i]; i++) {
+	var way = 'myimg/' + file[i]; 
+	sizeof(way, function(err, doc) {
+	    console.log(doc.width, doc.height);
+	});
+    };
 } else {
     console.log("Usage : node app.js (link)");
     process.exit();
