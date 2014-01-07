@@ -12,6 +12,7 @@ var express = require('express')
   , fs = require('fs')
   , sizeof = require('image-size');
 
+
 var app = express();
 
 // all environments
@@ -31,18 +32,182 @@ if ('development' == app.get('env')) {
 }
 
 var link = process.argv[2];
-var size = new String(process.argv[3]);
-
-var opewidth = size.substring(0, 3);
-var posx = size.search('x');
-var width = size.substring(3, posx);
-var opeheight = size.substring(posx+1, posx+4);
-var height = size.substring(posx+4, size.length);
+var widthsize = new String(process.argv[3]);
+var heightsize = new String(process.argv[4]);
+var arg = process.argv.length - 1;
+var opewidth = 0;
+var width = 0;
+var opeheight = 0;
+var height = 0;
+var count = 0;
 
 var url = [];
+var file = [];
 
-if (link)
+function	extract(size)
 {
+    for (var i = 0; i < size.length; i++)
+    {
+	if (size[i] >= 'a' && size[i] <= 'z')
+	    continue;
+	else
+	    return i;
+    }
+}
+
+function	init_size()
+{
+    if (arg == 3 || arg == 4) {
+	var pos = extract(widthsize);
+	if (pos == 3) {
+	    opewidth = widthsize.substring(0, 3);
+	    width = widthsize.substring(3, widthsize.length);
+	} else if (pos == 6) {
+	    opewidth = widthsize.substring(0, 6);
+	    width = widthsize.substring(6, widthsize.length);
+	}
+	if (opewidth == "inf" || opewidth == "equ" || opewidth == "sup" || opewidth == "infequ" || opewidth == "supequ")
+	    ;
+	else {
+	    console.log("incorrect width");
+	    process.exit();
+	}
+    }
+    if (arg == 4) {
+	var pos = extract(heightsize);
+	if (pos == 3) {
+	    opeheight = heightsize.substring(0, 3);
+	    height = heightsize.substring(3, heightsize.length);
+	} else if (pos == 6) {
+	    opeheight = heightsize.substring(0, 6);
+	    height = heightsize.substring(6, heightsize.length);
+	}
+	if (opeheight == "inf" || opeheight == "equ" || opeheight == "sup" || opeheight == "infequ" || opeheight == "supequ")
+	    ;
+	else {
+	    console.log("incorrect height");
+	    process.exit();
+	}
+    }
+}
+
+function	verif_width(docwidth, name)
+{
+    console.log('nom : ' +name);
+    if (opewidth == "inf") {
+	var inferior = (docwidth < width)? "save" :
+	    fs.unlink(name, function(err) {
+		if (err) {
+		    console.log("le fichier n'a pu etre supprimer");
+		}
+	    });
+	return;
+    }else if (opewidth == "equ") {
+	var equal = (docwidth == width)? "save" :
+	    fs.unlink(name, function(err) {
+		if (err) {
+		    console.log("le fichier n'a pu etre supprimer");
+		}
+	    });
+	return;
+    } else if (opewidth == "sup") {
+	var superior = (docwidth > width)? "save" :
+	    fs.unlink(name, function(err) {
+		if (err) {
+		    console.log("le fichier n'a pu etre supprimer");
+		}
+	    });
+	return;
+    }  else if (opewidth == "infequ") {
+	var superior = (docwidth >= width)? "save" :
+	    fs.unlink(name, function(err) {
+		if (err) {
+		    console.log("le fichier n'a pu etre supprimer");
+		}
+	    });
+	return;
+    }  else if (opewidth == "supequ") {
+	var superior = (docwidth >= width)? "save" :
+	    fs.unlink(name, function(err) {
+		if (err) {
+		    console.log("le fichier n'a pu etre supprimer");
+		}
+	    });
+	return;
+    } else {
+	console.log("argument incorrecte");
+	process.exit();
+    }
+}
+
+function	verif_height(docheight, name)
+{
+    console.log('nom : ' +name);
+    if (opeheight == "inf") {
+	var inferior = (docheight < height)? "save" :
+	    fs.unlink(name, function(err) {
+		if (err) {
+		    console.log("le fichier n'a pu etre supprimer");
+		}
+	    });
+	return;
+    }else if (opeheight == "equ") {
+	var equal = (docheight == height)? "save" :
+	    fs.unlink(name, function(err) {
+		if (err) {
+		    console.log("le fichier n'a pu etre supprimer");
+		}
+	    });
+	return;
+    } else if (opeheight == "sup") {
+	var superior = (docheight > height)? "save" :
+	    fs.unlink(name, function(err) {
+		if (err) {
+		    console.log("le fichier n'a pu etre supprimer");
+		}
+	    });
+	return;
+    }  else if (opeheight == "infequ") {
+	var superior = (docheight >= height)? "save" :
+	    fs.unlink(name, function(err) {
+		if (err) {
+		    console.log("le fichier n'a pu etre supprimer");
+		}
+	    });
+	return;
+    }  else if (opeheight == "supequ") {
+	var superior = (docheight >= height)? "save" :
+	    fs.unlink(name, function(err) {
+		if (err) {
+		    console.log("le fichier n'a pu etre supprimer");
+		}
+	    });
+	return;
+    } else {
+	console.log("argument incorrecte");
+	process.exit();
+    }
+}
+
+function	check_file()
+{
+    if (arg == 3 || arg == 4) {
+	var files = fs.readdirSync('myimg');
+	for(var i = 0; files[i]; i++) {
+	    var way = 'myimg/' + files[i];
+	    console.log(way);
+	    var dim = sizeof(way);
+	    verif_width(dim.width, way);
+	    if (arg == 4)
+		verif_height(dim.height, way);
+	}
+    }
+}
+
+if (link && (arg == 2 || arg == 3 || arg == 4))
+{
+    if (arg == 3 || arg == 4)
+	init_size();
     request(link, function(err, res, body){
 	if (!err && res.statusCode == 200) {
 	    var $ = cheerio.load(body);
@@ -51,27 +216,49 @@ if (link)
 		if (img.match('data:')) {
 		    return;
 		}
-		else if ((!img.match('.png')) || (!img.match('.jpg')) || (!img.match('.jpeg')))
-		    url.push(img); 
+		else if ((img.match('.png')) || (img.match('.jpg')) ||
+			 (img.match('.jpeg')))
+		    url.push(img);
 	    });
-	    /*	    console.log(url);
-		    for (var i = 0; i < url.length; i++) {
-		    request(url[i]).pipe(fs.createWriteStream('myimg/' + i));
-		    }*/
+	    console.log(url);
+	    for (var j = 0; j < url.length; j++) {
+		if (url[j].match('.jpg')) {
+		    var namejpg = j + '.jpg';    
+		    file.push(namejpg)
+		} else if (url[j].match('.png')) {
+		    var namepng = j + '.png';    
+		    file.push(namepng)
+		} else if (url[j].match('.jpeg')) {
+		    var namejpeg = j + '.jpeg';    
+		    file.push(namejpeg)
+		}
+	    }
+	    for (var i = 0; i < url.length; i++) {
+		var opt = {'url': url[i], 'encoding': null};
+		var name =""
+		if (url[i].match('.jpg')) {
+		    var name = 'myimg/'+i+'.jpg';
+		} else if (url[i].match('.png')) {
+		    var name = 'myimg/'+i+'.png';
+		} else if (url[i].match('.jpeg')) {
+		    var name = 'myimg/'+i+'.jpeg';
+		}
+		var write = request(opt).pipe(fs.createWriteStream(name));
+		write.on('finish', function(){
+		    count +=1;
+		    if (count == url.length)
+			res.emit('end');
+		});
+	    };
 	}
+    }).on('end', function(){
+	check_file();
     });
-    var file = fs.readdirSync('myimg');
-    for(var i = 0; file[i]; i++) {
-	var way = 'myimg/' + file[i]; 
-	sizeof(way, function(err, doc) {
-	    console.log(doc.width, doc.height);
-	});
-    };
 } else {
     console.log("Usage : node app.js (link)");
     process.exit();
 }
-
+    
 app.get('/', routes.index);
 app.get('/users', user.list);
 
