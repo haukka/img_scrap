@@ -13,6 +13,9 @@ var express = require('express')
   , sizeof = require('image-size');
 
 
+var EventEmitter = require('events').EventEmitter;
+var fire = new EventEmitter();
+var exec = require('child_process').exec;
 var app = express();
 
 // all environments
@@ -202,6 +205,7 @@ function	check_file()
 		verif_height(dim.height, way);
 	}
     }
+    fire.emit('launch');
 }
 
 if (link && (arg == 2 || arg == 3 || arg == 4))
@@ -233,6 +237,7 @@ if (link && (arg == 2 || arg == 3 || arg == 4))
 		    file.push(namejpeg)
 		}
 	    }
+	    console.log(url.length);
 	    for (var i = 0; i < url.length; i++) {
 		var opt = {'url': url[i], 'encoding': null};
 		var name =""
@@ -246,6 +251,7 @@ if (link && (arg == 2 || arg == 3 || arg == 4))
 		var write = request(opt).pipe(fs.createWriteStream(name));
 		write.on('finish', function(){
 		    count +=1;
+		    console.log(count);
 		    if (count == url.length)
 			res.emit('end');
 		});
@@ -253,14 +259,25 @@ if (link && (arg == 2 || arg == 3 || arg == 4))
 	}
     }).on('end', function(){
 	check_file();
+	fire.on('launch', function(){
+	    console.log('test');
+	    exec('/usr/bin/firefox localhost:3001/', function(err){
+		if (err){
+		    console.log('error');
+		} else {
+		    console.log('success');
+		}
+	    });
+	});
     });
 } else {
     console.log("Usage : node app.js (link)");
     process.exit();
 }
-    
-app.get('/', routes.index);
-app.get('/users', user.list);
+
+app.get('/', function(req, res){
+    console.log('affiche');
+});
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
