@@ -3,14 +3,15 @@
  */
 
 var express = require('express')
-  , routes = require('./routes')
-  , user = require('./routes/user')
-  , http = require('http')
-  , path = require('path')
-  , request = require('request')
-  , cheerio = require('cheerio')
-  , fs = require('fs')
-  , sizeof = require('image-size');
+ , routes = require('./routes')
+ , user = require('./routes/user')
+ , http = require('http')
+ , path = require('path')
+ , request = require('request')
+ , cheerio = require('cheerio')
+ , fs = require('fs')
+ , sizeof = require('image-size')
+ , io = require('socket.io');
 
 
 var EventEmitter = require('events').EventEmitter;
@@ -28,12 +29,15 @@ app.use(express.bodyParser());
 app.use(express.methodOverride());
 app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'html')));
+
 
 // development only
 if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
+var html = './html/'
 var link = process.argv[2];
 var widthsize = new String(process.argv[3]);
 var heightsize = new String(process.argv[4]);
@@ -195,9 +199,9 @@ function	verif_height(docheight, name)
 function	check_file()
 {
     if (arg == 3 || arg == 4) {
-	var files = fs.readdirSync('myimg');
+	var files = fs.readdirSync('html/myimg');
 	for(var i = 0; files[i]; i++) {
-	    var way = 'myimg/' + files[i];
+	    var way = 'html/myimg/' + files[i];
 	    console.log(way);
 	    var dim = sizeof(way);
 	    verif_width(dim.width, way);
@@ -242,11 +246,11 @@ if (link && (arg == 2 || arg == 3 || arg == 4))
 		var opt = {'url': url[i], 'encoding': null};
 		var name =""
 		if (url[i].match('.jpg')) {
-		    var name = 'myimg/'+i+'.jpg';
+		    var name = 'html/myimg/'+i+'.jpg';
 		} else if (url[i].match('.png')) {
-		    var name = 'myimg/'+i+'.png';
+		    var name = 'html/myimg/'+i+'.png';
 		} else if (url[i].match('.jpeg')) {
-		    var name = 'myimg/'+i+'.jpeg';
+		    var name = 'html/myimg/'+i+'.jpeg';
 		}
 		var write = request(opt).pipe(fs.createWriteStream(name));
 		write.on('finish', function(){
@@ -261,11 +265,11 @@ if (link && (arg == 2 || arg == 3 || arg == 4))
 	check_file();
 	fire.on('launch', function(){
 	    console.log('test');
-	    exec('/usr/bin/firefox localhost:3001/', function(err){
+	    exec('/usr/bin/google-chrome localhost:3001/', function(err){
 		if (err){
 		    console.log('error');
 		} else {
-		    console.log('success');
+		    //console.log('success');
 		}
 	    });
 	});
@@ -276,9 +280,21 @@ if (link && (arg == 2 || arg == 3 || arg == 4))
 }
 
 app.get('/', function(req, res){
-    console.log('affiche');
+    res.sendfile(html + 'index.html');
 });
 
-http.createServer(app).listen(app.get('port'), function(){
+var server = http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
 });
+
+io = io.listen(server);
+
+
+io.sockets.on('connection', function(socket) {
+    var files = fs.readdirSync('html/myimg');	
+    var i = 0;
+    for (i = 0; i<files.length; i++){
+	socket.emit('affiche', {link: files[i]});
+    }
+});
+
