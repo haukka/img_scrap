@@ -241,7 +241,7 @@ if (link && (arg == 2 || arg == 3 || arg == 4))
 		    file.push(namejpeg)
 		}
 	    }
-	    console.log(url.length);
+//	    console.log(url.length);
 	    for (var i = 0; i < url.length; i++) {
 		var opt = {'url': url[i], 'encoding': null};
 		var name =""
@@ -255,7 +255,6 @@ if (link && (arg == 2 || arg == 3 || arg == 4))
 		var write = request(opt).pipe(fs.createWriteStream(name));
 		write.on('finish', function(){
 		    count +=1;
-		    console.log(count);
 		    if (count == url.length)
 			res.emit('end');
 		});
@@ -264,7 +263,6 @@ if (link && (arg == 2 || arg == 3 || arg == 4))
     }).on('end', function(){
 	check_file();
 	fire.on('launch', function(){
-	    console.log('test');
 	    exec('/usr/bin/google-chrome localhost:3001/', function(err){
 		if (err){
 		    console.log('error');

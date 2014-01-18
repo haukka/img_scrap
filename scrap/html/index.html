@@ -2,7 +2,7 @@
   <head>
     <title>Gallerie</title>
     <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
-    <link type="text/css" href="/styles/bottom.css" rel="stylesheet" />
+    <link type="text/css" href="gallerie.css" rel="stylesheet" />
   </head>
   <body>
     <h1>Gallerie d'image</h1>
@@ -20,7 +20,7 @@
       insereimage(data.link);
       });
       function insereimage(data) {
-      $('#slide').prepend('<li><a href="myimg/ '+data +'"><img src="myimg/' + data + '"></a></li>');
+      $('#slide').prepend('<li><a href="#"><img src="myimg/' + data + '"></a></li>');
       }
       $('#aff').click(function(){
       $("#slide").show();
