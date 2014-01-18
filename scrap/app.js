@@ -62,7 +62,7 @@ function	extract(size)
 
 function	init_size()
 {
-    if (arg == 3 || arg == 4) {
+    if (arg == 3 || arg == 4 && widthsize != "NULL") {
 	var pos = extract(widthsize);
 	if (pos == 3) {
 	    opewidth = widthsize.substring(0, 3);
@@ -202,6 +202,7 @@ function	check_file()
 	    var way = 'html/myimg/' + files[i];
 	    console.log(way);
 	    var dim = sizeof(way);
+	    if (widthsize != "NULL")
 	    verif_width(dim.width, way);
 	    if (arg == 4)
 		verif_height(dim.height, way);
@@ -293,4 +294,3 @@ io.sockets.on('connection', function(socket) {
 	socket.emit('affiche', {link: files[i]});
     }
 });
-
