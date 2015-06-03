@@ -13,6 +13,6 @@ The project will scrap all the picture from the pages in several steps :
 
 4) All the pictures which contains extension such as .png, .jpg or .jpeg will be stored into a directory
 
-5) An event will be launch and open the navigator "google chrome"
+5) An event will be launched and open the navigator "google chrome"
 
-6) All the pictures from the directory will be send to the front page thanks to the Socket.io
+6) All the pictures from the directory will be sent to the front page thanks to the Socket.io
